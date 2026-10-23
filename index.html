@@ -1,0 +1,266 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Repositorio Académico | Centro Social</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f3f6fb;
+      color: #24324a;
+    }
+
+    header {
+      background: #173b68;
+      color: white;
+      text-align: center;
+      padding: 38px 18px;
+    }
+
+    header h1 { margin: 0 0 12px; }
+    header p { margin: 0; line-height: 1.6; }
+
+    main {
+      max-width: 1050px;
+      margin: 28px auto;
+      padding: 0 18px;
+    }
+
+    .buscador {
+      display: block;
+      width: 100%;
+      padding: 15px;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      font-size: 16px;
+      margin-bottom: 18px;
+    }
+
+    .categorias {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+      margin-bottom: 24px;
+    }
+
+    .categorias button {
+      border: 1px solid #173b68;
+      background: white;
+      color: #173b68;
+      padding: 10px 15px;
+      border-radius: 20px;
+      cursor: pointer;
+    }
+
+    .categorias button.activo,
+    .categorias button:hover {
+      background: #173b68;
+      color: white;
+    }
+
+    #resultados {
+      margin-bottom: 16px;
+      color: #52647b;
+    }
+
+    .proyectos {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 18px;
+    }
+
+    .tarjeta {
+      background: white;
+      border: 1px solid #dce5f0;
+      border-radius: 14px;
+      padding: 20px;
+      box-shadow: 0 3px 10px #173b6810;
+    }
+
+    .tarjeta h2 {
+      font-size: 19px;
+      margin-top: 0;
+    }
+
+    .etiqueta {
+      display: inline-block;
+      background: #e0ecff;
+      color: #173b68;
+      padding: 5px 10px;
+      border-radius: 15px;
+      font-size: 12px;
+    }
+
+    .tarjeta p { line-height: 1.6; }
+
+    .enlace {
+      color: #1759a5;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    .enlace:hover { text-decoration: underline; }
+
+    footer {
+      text-align: center;
+      padding: 25px;
+      color: #607086;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>📚 Repositorio Académico</h1>
+    <p>Institución Educativa Centro Social</p>
+    <p>Explora, consulta y descubre los proyectos de nuestra comunidad.</p>
+  </header>
+
+  <main>
+    <input
+      id="busqueda"
+      class="buscador"
+      type="search"
+      placeholder="🔎 Busca por título, tema o palabra clave..."
+      aria-label="Buscar proyectos"
+    >
+
+    <div class="categorias" id="categorias">
+      <button class="activo" data-categoria="Todas">Todos</button>
+      <button data-categoria="Salud">Salud</button>
+      <button data-categoria="Tecnología">Tecnología</button>
+      <button data-categoria="Medio ambiente">Medio ambiente</button>
+      <button data-categoria="Educación">Educación</button>
+      <button data-categoria="Ciencias sociales">Ciencias sociales</button>
+    </div>
+
+    <p id="resultados" aria-live="polite"></p>
+    <section class="proyectos" id="proyectos"></section>
+  </main>
+
+  <footer>
+    Repositorio Académico · Centro Social 💙
+  </footer>
+
+  <script>
+    // EJEMPLOS: reemplazaremos estos datos por los proyectos reales.
+    const proyectos = [
+      {
+        titulo: "Salud mental en adolescentes",
+        categoria: "Salud",
+        descripcion: "Ejemplo de proyecto sobre bienestar emocional.",
+        etiquetas: "salud mental emociones bienestar jóvenes",
+        enlace: ""
+      },
+      {
+        titulo: "Cuidado del medio ambiente",
+        categoria: "Medio ambiente",
+        descripcion: "Ejemplo de proyecto sobre el cuidado del entorno.",
+        etiquetas: "reciclaje contaminación naturaleza",
+        enlace: ""
+      },
+      {
+        titulo: "Tecnología en la educación",
+        categoria: "Tecnología",
+        descripcion: "Ejemplo sobre herramientas digitales para aprender.",
+        etiquetas: "tecnología informática educación digital",
+        enlace: ""
+      },
+      {
+        titulo: "Convivencia escolar",
+        categoria: "Educación",
+        descripcion: "Ejemplo sobre respeto y resolución de conflictos.",
+        etiquetas: "convivencia respeto colegio conflictos",
+        enlace: ""
+      }
+    ];
+
+    const campo = document.getElementById("busqueda");
+    const contenedor = document.getElementById("proyectos");
+    const contador = document.getElementById("resultados");
+    const botones = document.querySelectorAll("#categorias button");
+
+    let categoriaActual = "Todas";
+
+    function mostrarProyectos() {
+      const termino = campo.value.trim().toLowerCase();
+
+      const encontrados = proyectos.filter(proyecto => {
+        const texto = (
+          proyecto.titulo + " " +
+          proyecto.categoria + " " +
+          proyecto.descripcion + " " +
+          proyecto.etiquetas
+        ).toLowerCase();
+
+        const coincideTexto = texto.includes(termino);
+        const coincideCategoria =
+          categoriaActual === "Todas" ||
+          proyecto.categoria === categoriaActual;
+
+        return coincideTexto && coincideCategoria;
+      });
+
+      contador.textContent =
+        encontrados.length + (
+          encontrados.length === 1
+            ? " proyecto encontrado"
+            : " proyectos encontrados"
+        );
+
+      contenedor.replaceChildren();
+
+      encontrados.forEach(proyecto => {
+        const tarjeta = document.createElement("article");
+        tarjeta.className = "tarjeta";
+
+        const titulo = document.createElement("h2");
+        titulo.textContent = proyecto.titulo;
+
+        const etiqueta = document.createElement("span");
+        etiqueta.className = "etiqueta";
+        etiqueta.textContent = proyecto.categoria;
+
+        const descripcion = document.createElement("p");
+        descripcion.textContent = proyecto.descripcion;
+
+        tarjeta.append(titulo, etiqueta, descripcion);
+
+        if (proyecto.enlace) {
+          const enlace = document.createElement("a");
+          enlace.className = "enlace";
+          enlace.href = proyecto.enlace;
+          enlace.textContent = "Consultar proyecto →";
+          tarjeta.appendChild(enlace);
+        }
+
+        contenedor.appendChild(tarjeta);
+      });
+
+      if (encontrados.length === 0) {
+        contenedor.textContent =
+          "No encontramos proyectos con esos términos.";
+      }
+    }
+
+    campo.addEventListener("input", mostrarProyectos);
+
+    botones.forEach(boton => {
+      boton.addEventListener("click", () => {
+        categoriaActual = boton.dataset.categoria;
+
+        botones.forEach(b => b.classList.remove("activo"));
+        boton.classList.add("activo");
+
+        mostrarProyectos();
+      });
+    });
+
+    mostrarProyectos();
+  </script>
+</body>
+</html>
